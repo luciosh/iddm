@@ -7,9 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1TSiutzG4tvokfYCkRJbnpEyfFXnZuy3k
 """
 
-# # Acesso ao Drive
-# from google.colab import drive
-# drive.mount('/content/drive')
+import urllib.request
+url = "https://github.com/srg-lc/iddm/blob/main/data.zip?raw=true"
+print ("download start!")
+filename, headers = urllib.request.urlretrieve(url, filename="data.zip")
+print ("download complete!")
+print ("download file location: ", filename)
 
 # Setup
 import tensorflow as tf
@@ -49,7 +52,7 @@ CSV_HEADER = [
     "inter_arrival_time",                
 ]
 data_url = (
-    "https://media.githubusercontent.com/media/srg-lc/iddm/main/data.csv"
+    "data.zip"
 )
 data = pd.read_csv(data_url, header=None, low_memory=False, names=CSV_HEADER)
 data = data.drop(index=[0])
