@@ -295,9 +295,9 @@ class NeuralDecisionForest(keras.Model):
         outputs /= len(self.ensemble)
         return outputs
 
-learning_rate = 0.05
+learning_rate = 0.0001
 batch_size = 265
-num_epochs = 10
+num_epochs = 50
 hidden_units = [64, 64]
 
 
@@ -315,12 +315,12 @@ def run_experiment(model):
         train_data_file, shuffle=True, batch_size=batch_size
     )
     print(train_dataset)
-    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=3, verbose=0, mode='max')
-    mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="sparse_categorical_accuracy", mode='max', save_freq=4828)
-    reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="sparse_categorical_accuracy", factor=0.1, patience=7, verbose=1, min_delta=1e-1, mode='min')
+    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=10, verbose=0, mode='max')
+    mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="loss", mode='min')
+    reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.1, patience=7, verbose=1, min_delta=1e-1, mode='min')
 
-    # model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping,reduce_lr_loss])
-    model.fit(train_dataset, epochs=num_epochs)
+    model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping, reduce_lr_loss])
+    # model.fit(train_dataset, epochs=num_epochs)
     print("Model training finished")
 
     print("Evaluating the model on the test data...")
@@ -330,7 +330,7 @@ def run_experiment(model):
     print(f"Test accuracy: {round(accuracy * 100, 2)}%")
 
 # Experiment 1: train a decision tree model
-num_trees = 10
+num_trees = 15
 depth = 10
 used_features_rate = 1.0
 num_classes = len(TARGET_LABELS)
@@ -354,7 +354,7 @@ run_experiment(tree_model)
 
 # Experiment 2: train a forest model
 num_trees = 25
-depth = 5
+depth = 7
 used_features_rate = 0.5
 num_classes = len(TARGET_LABELS)
 
