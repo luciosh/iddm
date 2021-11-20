@@ -22,7 +22,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras import callbacks
 from sklearn import preprocessing
-
+from matplotlib import pyplot as plt
+from sklearn import metrics
 import math
 
 CSV_HEADER = [
@@ -297,11 +298,11 @@ class NeuralDecisionForest(keras.Model):
 
 learning_rate = 0.0001
 batch_size = 265
-num_epochs = 50
+num_epochs = 1
 hidden_units = [64, 64]
 
 
-def run_experiment(model):
+def run_experiment(model, model_type):
 
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
@@ -314,24 +315,58 @@ def run_experiment(model):
     train_dataset = get_dataset_from_csv(
         train_data_file, shuffle=True, batch_size=batch_size
     )
-    print(train_dataset)
-    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=10, verbose=0, mode='max')
-    mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="loss", mode='min')
-    reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.1, patience=7, verbose=1, min_delta=1e-1, mode='min')
+    # print(train_dataset)
+    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=7, verbose=0, mode='max', restore_best_weights = True)
+    # mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="loss", mode='min')
+    reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="sparse_categorical_accuracy", factor=0.2, patience=5, verbose=1, min_delta=0.0001, mode='max')
 
-    model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping, reduce_lr_loss])
+    history = model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping, reduce_lr_loss])
     # model.fit(train_dataset, epochs=num_epochs)
     print("Model training finished")
-
+    model_name = "model_ndf" + str(model_type)
+    model.save(model_name)
     print("Evaluating the model on the test data...")
+    model = keras.models.load_model(model_name)
     test_dataset = get_dataset_from_csv(test_data_file, batch_size=batch_size)
 
     _, accuracy = model.evaluate(test_dataset)
+    print("------ Acuracia ---------")
+
     print(f"Test accuracy: {round(accuracy * 100, 2)}%")
+   
+    print("------ Grafico de acuracia e Loss ---------")
+    # https://www.ti-enxame.com/pt/python/grafico-de-treinamento-keras-tensorflow-em-tempo-real/833518371/
+    print(history.history.keys())
+    # summarize history for accuracy
+    plt.plot(history.history['sparse_categorical_accuracy'])
+    plt.plot(history.history['sparse_categorical_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+    print("------ Confusion matrix ---------")
+   
+    y_pred = model.predict(test_dataset)
+    y_teste = model.get_layer(name = 'device_model')
+    confusion_matrix = metrics.confusion_matrix(y_teste, np.rint(y_pred))
+    print(confusion_matrix)
+    # https://stackoverflow.com/questions/56458526/get-confusion-matrix-from-a-keras-model
+
+
 
 # Experiment 1: train a decision tree model
-num_trees = 15
-depth = 10
+num_trees = 3
+depth = 3
 used_features_rate = 1.0
 num_classes = len(TARGET_LABELS)
 
@@ -350,11 +385,11 @@ def create_tree_model():
 
 
 tree_model = create_tree_model()
-run_experiment(tree_model)
+run_experiment(tree_model, 1)
 
 # Experiment 2: train a forest model
 num_trees = 25
-depth = 7
+depth = 5
 used_features_rate = 0.5
 num_classes = len(TARGET_LABELS)
 
@@ -376,8 +411,8 @@ def create_forest_model():
 
 
 forest_model = create_forest_model()
+run_experiment(forest_model, 2)
 
-run_experiment(forest_model)
 
 """-------------------------------------------------------------------------------"""
 
