@@ -298,7 +298,7 @@ class NeuralDecisionForest(keras.Model):
 
 learning_rate = 0.0001
 batch_size = 265
-num_epochs = 1
+num_epochs = 20
 hidden_units = [64, 64]
 
 
@@ -316,7 +316,7 @@ def run_experiment(model, model_type):
         train_data_file, shuffle=True, batch_size=batch_size
     )
     # print(train_dataset)
-    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=7, verbose=0, mode='max', restore_best_weights = True)
+    earlyStopping = tf.keras.callbacks.EarlyStopping(monitor="sparse_categorical_accuracy", patience=10, verbose=0, mode='max', restore_best_weights = True)
     # mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="loss", mode='min')
     reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="sparse_categorical_accuracy", factor=0.2, patience=5, verbose=1, min_delta=0.0001, mode='max')
 
@@ -330,11 +330,11 @@ def run_experiment(model, model_type):
     test_dataset = get_dataset_from_csv(test_data_file, batch_size=batch_size)
 
     _, accuracy = model.evaluate(test_dataset)
-    print("------ Acuracia ---------")
+    print("------ Accuracy ---------")
 
     print(f"Test accuracy: {round(accuracy * 100, 2)}%")
    
-    print("------ Grafico de acuracia e Loss ---------")
+    print("------ Graphic ---------")
     # https://www.ti-enxame.com/pt/python/grafico-de-treinamento-keras-tensorflow-em-tempo-real/833518371/
     print(history.history.keys())
     # summarize history for accuracy
@@ -355,18 +355,21 @@ def run_experiment(model, model_type):
     plt.show()
 
     print("------ Confusion matrix ---------")
-   
     y_pred = model.predict(test_dataset)
-    y_teste = model.get_layer(name = 'device_model')
-    confusion_matrix = metrics.confusion_matrix(y_teste, np.rint(y_pred))
-    print(confusion_matrix)
+    print("---------  ---------")
+    print(y_pred)
+    print("---------  ---------")
+    
+    # y_teste = model.get_layer(name = 'device_model')
+    # confusion_matrix = metrics.confusion_matrix(y_teste, np.rint(y_pred))
+    # print(confusion_matrix)
     # https://stackoverflow.com/questions/56458526/get-confusion-matrix-from-a-keras-model
 
 
 
 # Experiment 1: train a decision tree model
-num_trees = 3
-depth = 3
+num_trees = 10
+depth = 9
 used_features_rate = 1.0
 num_classes = len(TARGET_LABELS)
 
@@ -388,7 +391,7 @@ tree_model = create_tree_model()
 run_experiment(tree_model, 1)
 
 # Experiment 2: train a forest model
-num_trees = 25
+num_trees = 20
 depth = 5
 used_features_rate = 0.5
 num_classes = len(TARGET_LABELS)
