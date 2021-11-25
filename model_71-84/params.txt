@@ -1,0 +1,19 @@
+run-experiment.
+learning_rate = 0.00001
+batch_size = 265
+num_epochs = 30
+hidden_units = [64, 64]
+
+1
+num_trees = 15
+depth = 8
+used_features_rate = 1.0
+num_classes = len(TARGET_LABELS)
+loss: 1.7601 - sparse_categorical_accuracy: 0.7198
+
+2
+num_trees = 25
+depth = 5
+used_features_rate = 0.5
+num_classes = len(TARGET_LABELS)
+loss: 1.6664 - sparse_categorical_accuracy: 0.8430
