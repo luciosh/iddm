@@ -1,0 +1,10 @@
+learning_rate = 0.000001
+batch_size = 265
+num_epochs = 40
+hidden_units = [64, 64]
+
+num_trees = 10
+depth = 10
+used_features_rate = 1.0
+
+loss: 2.2800 - sparse_categorical_accuracy: 0.8061

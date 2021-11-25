@@ -296,9 +296,9 @@ class NeuralDecisionForest(keras.Model):
         outputs /= len(self.ensemble)
         return outputs
 
-learning_rate = 0.0001
+learning_rate = 0.000001
 batch_size = 265
-num_epochs = 20
+num_epochs = 40
 hidden_units = [64, 64]
 
 
@@ -320,11 +320,12 @@ def run_experiment(model, model_type):
     # mcp_save = tf.keras.callbacks.ModelCheckpoint('.mdl_wts.hdf5', save_best_only=True, monitor="loss", mode='min')
     reduce_lr_loss = tf.keras.callbacks.ReduceLROnPlateau(monitor="sparse_categorical_accuracy", factor=0.2, patience=5, verbose=1, min_delta=0.0001, mode='max')
 
-    history = model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping, reduce_lr_loss])
+    # history = model.fit(train_dataset, epochs=num_epochs, callbacks=[earlyStopping, reduce_lr_loss])
     # model.fit(train_dataset, epochs=num_epochs)
     print("Model training finished")
-    model_name = "model_ndf" + str(model_type)
-    model.save(model_name)
+    # model_name = "best_models/model_ndf1-80" + str(model_type)
+    model_name = "best_models/model_ndf1-80"
+    # model.save(model_name)
     print("Evaluating the model on the test data...")
     model = keras.models.load_model(model_name)
     test_dataset = get_dataset_from_csv(test_data_file, batch_size=batch_size)
@@ -369,7 +370,7 @@ def run_experiment(model, model_type):
 
 # Experiment 1: train a decision tree model
 num_trees = 10
-depth = 9
+depth = 10
 used_features_rate = 1.0
 num_classes = len(TARGET_LABELS)
 
