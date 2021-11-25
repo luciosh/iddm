@@ -296,7 +296,7 @@ class NeuralDecisionForest(keras.Model):
         outputs /= len(self.ensemble)
         return outputs
 
-learning_rate = 0.000001
+learning_rate = 0.00001
 batch_size = 265
 num_epochs = 40
 hidden_units = [64, 64]
@@ -368,28 +368,28 @@ def run_experiment(model, model_type):
 
 
 
-# # Experiment 1: train a decision tree model
-# num_trees = 10
-# depth = 10
-# used_features_rate = 1.0
-# num_classes = len(TARGET_LABELS)
+# Experiment 1: train a decision tree model
+num_trees = 15
+depth = 8
+used_features_rate = 1.0
+num_classes = len(TARGET_LABELS)
 
 
-# def create_tree_model():
-#     inputs = create_model_inputs()
-#     features = encode_inputs(inputs)
-#     features = layers.BatchNormalization()(features)
-#     num_features = features.shape[1]
+def create_tree_model():
+    inputs = create_model_inputs()
+    features = encode_inputs(inputs)
+    features = layers.BatchNormalization()(features)
+    num_features = features.shape[1]
 
-#     tree = NeuralDecisionTree(depth, num_features, used_features_rate, num_classes)
+    tree = NeuralDecisionTree(depth, num_features, used_features_rate, num_classes)
 
-#     outputs = tree(features)
-#     model = keras.Model(inputs=inputs, outputs=outputs)
-#     return model
+    outputs = tree(features)
+    model = keras.Model(inputs=inputs, outputs=outputs)
+    return model
 
 
-# tree_model = create_tree_model()
-# run_experiment(tree_model, 1)
+tree_model = create_tree_model()
+run_experiment(tree_model, 1)
 
 # Experiment 2: train a forest model
 num_trees = 20
