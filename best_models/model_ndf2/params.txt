@@ -1,0 +1,6 @@
+num_trees = 25
+depth = 5
+used_features_rate = 0.5
+num_classes = len(TARGET_LABELS)
+
+loss: 1.6867 - sparse_categorical_accuracy: 0.8075
